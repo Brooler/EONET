@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace EONET.Core.Models
 {
@@ -11,6 +12,8 @@ namespace EONET.Core.Models
         public string Description { get; set; }
 
         public string Link { get; set; }
+
+        public DateTime? Closed { get; set; }
 
         public IEnumerable<CategoryItemModel> Categories { get; set; }
 

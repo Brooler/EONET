@@ -1,3 +1,7 @@
 .EventsList table {
   margin: auto;
 }
+
+.EventsList p {
+  text-align: center;
+}
