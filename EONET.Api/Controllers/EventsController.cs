@@ -3,6 +3,7 @@ using EONET.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace EONET.Api.Controllers
@@ -28,6 +29,12 @@ namespace EONET.Api.Controllers
             {
                 return Ok(await _eventsService.GetEventsList(filter));
             }
+            catch (HttpRequestException httpException)
+            {
+                _logger.LogError("GetEventList Request Error: {@exception}", httpException);
+                //TODO: Better Error Handling for failed request
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError("GetEventList Error: {@exception}", ex);
@@ -42,7 +49,14 @@ namespace EONET.Api.Controllers
             {
                 return Ok(await _eventsService.GetEvent(id));
             }
-            catch(Exception ex)
+            catch (HttpRequestException httpException)
+            {
+                _logger.LogError("GetEvent Request Error: {@exception}", httpException);
+                //TODO: Better Error Handling for failed request
+                //Some cases here is wrong Event Id
+                throw;
+            }
+            catch (Exception ex)
             {
                 _logger.LogError("GetEvent Error: {@exception}", ex);
                 throw;

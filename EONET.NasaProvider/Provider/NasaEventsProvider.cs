@@ -36,6 +36,11 @@ namespace EONET.NasaProvider.Provider
 
                 return responseObject.Categories;
             }
+            catch(HttpRequestException httpException)
+            {
+                _logger.LogError("GetCategories Request Error: {@exception}", httpException);
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError("GetEventsList Error: {@exception}", ex);
@@ -52,6 +57,11 @@ namespace EONET.NasaProvider.Provider
                 response.EnsureSuccessStatusCode();
 
                 return JsonConvert.DeserializeObject<EventModel>(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException httpException)
+            {
+                _logger.LogError("GetEvent Request Error: {@exception}", httpException);
+                throw;
             }
             catch (Exception ex)
             {
@@ -73,6 +83,11 @@ namespace EONET.NasaProvider.Provider
                 var responseObject = JsonConvert.DeserializeObject<NasaEventsResponseModel>(await response.Content.ReadAsStringAsync());
 
                 return responseObject.Events;
+            }
+            catch (HttpRequestException httpException)
+            {
+                _logger.LogError("GetEventsList Request Error: {@exception}", httpException);
+                throw;
             }
             catch (Exception ex)
             {
