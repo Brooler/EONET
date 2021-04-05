@@ -1,5 +1,4 @@
-﻿using EONET.Core.Enums;
-using EONET.Core.Interfaces;
+﻿using EONET.Core.Interfaces;
 using EONET.Core.Models;
 using EONET.NasaProvider.Models;
 using Microsoft.Extensions.Configuration;
@@ -16,20 +15,20 @@ namespace EONET.NasaProvider.Provider
     {
         private readonly IConfiguration _config;
         private readonly ILogger<NasaEventsProvider> _logger;
+        private readonly HttpClient _httpClient;
 
-        public NasaEventsProvider(IConfiguration config, ILogger<NasaEventsProvider> logger)
+        public NasaEventsProvider(IConfiguration config, ILogger<NasaEventsProvider> logger, HttpClient httpClient)
         {
             _config = config;
             _logger = logger;
+            _httpClient = httpClient;
         }
 
         public async Task<EventModel> GetEvent(string eventId)
         {
             try
             {
-                using var client = CreateHttpClient();
-
-                var response = await client.GetAsync($"{_config["NasaProvider:EventEndpoint"].TrimEnd('/')}/{eventId}");
+                var response = await _httpClient.GetAsync($"{_config["NasaProvider:EventEndpoint"].TrimEnd('/')}/{eventId}");
 
                 response.EnsureSuccessStatusCode();
 
@@ -42,43 +41,13 @@ namespace EONET.NasaProvider.Provider
             }
         }
 
-        public async Task<IEnumerable<EventModel>> GetEventsList(string source, EventStatusEnum? status, int? limit, int? days)
+        public async Task<IEnumerable<EventModel>> GetEventsList(EventListFilterModel filter)
         {
             try
             {
-                using var client = CreateHttpClient();
+                var parameters = filter.ToDictionary();
 
-                var parameters = new Dictionary<string, string>();
-
-                if (!string.IsNullOrEmpty(source))
-                {
-                    parameters.Add("source", source);
-                }
-
-                if (status.HasValue)
-                {
-                    switch(status.Value)
-                    {
-                        case EventStatusEnum.Open:
-                            parameters.Add("status", "open");
-                            break;
-                        case EventStatusEnum.Closed:
-                            parameters.Add("status", "closed");
-                            break;
-                    }
-                }
-
-                if (limit.HasValue)
-                {
-                    parameters.Add("limit", limit.Value.ToString());
-                } 
-                
-                if (days.HasValue)
-                {
-                    parameters.Add("days", days.Value.ToString());
-                }
-
-                var response = await client.GetAsync($"{_config["NasaProvider:ListEndpoint"]}{CreateParametersString(parameters)}");
+                var response = await _httpClient.GetAsync($"{_config["NasaProvider:ListEndpoint"]}{CreateParametersString(parameters)}");
 
                 response.EnsureSuccessStatusCode();
 
@@ -91,15 +60,6 @@ namespace EONET.NasaProvider.Provider
                 _logger.LogError("GetEventsList Error: {@exception}", ex);
                 throw;
             }
-        }
-
-        private HttpClient CreateHttpClient()
-        {
-            var client = new HttpClient();
-
-            client.BaseAddress = new Uri(_config["NasaProvider:BaseUrl"]);
-
-            return client;
         }
 
         private string CreateParametersString(Dictionary<string, string> parameters)

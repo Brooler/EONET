@@ -1,3 +1,7 @@
+using EONET.Api.Interfaces;
+using EONET.Api.Services;
+using EONET.Core.Interfaces;
+using EONET.NasaProvider.Provider;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,6 +30,12 @@ namespace EONET.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddTransient<IEventsService, EventsService>();
+            services.AddHttpClient<IEventsProvider, NasaEventsProvider>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["NasaProvider:BaseUrl"]);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

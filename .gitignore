@@ -6,3 +6,4 @@
 */bin
 */obj
 /EONET.Api/appsettings.Development.json
+*.user

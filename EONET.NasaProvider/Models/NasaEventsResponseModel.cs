@@ -11,6 +11,6 @@ namespace EONET.NasaProvider.Models
 
         public string Link { get; set; }
 
-        public List<EventModel> Events { get; set; }
+        public IEnumerable<EventModel> Events { get; set; }
     }
 }

@@ -4,5 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EONET.Core\EONET.Core.csproj" />
+    <ProjectReference Include="..\EONET.NasaProvider\EONET.NasaProvider.csproj" />
+  </ItemGroup>
+
 
 </Project>
