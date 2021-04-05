@@ -29,10 +29,21 @@ namespace EONET.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => {
+                    options.AddDefaultPolicy(builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                    });
+                });
             services.AddControllers();
 
             services.AddTransient<IEventsService, EventsService>();
+            services.AddTransient<ICategoriesService, CategoriesService>();
             services.AddHttpClient<IEventsProvider, NasaEventsProvider>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["NasaProvider:BaseUrl"]);
+            });
+            services.AddHttpClient<ICategoriesProvider, NasaEventsProvider>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["NasaProvider:BaseUrl"]);
             });
@@ -49,6 +60,8 @@ namespace EONET.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EONET.NasaProvider.Provider
 {
-    public class NasaEventsProvider : IEventsProvider
+    public class NasaEventsProvider : IEventsProvider, ICategoriesProvider
     {
         private readonly IConfiguration _config;
         private readonly ILogger<NasaEventsProvider> _logger;
@@ -22,6 +22,25 @@ namespace EONET.NasaProvider.Provider
             _config = config;
             _logger = logger;
             _httpClient = httpClient;
+        }
+
+        public async Task<IEnumerable<CategoryModel>> GetCategories()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(_config["NasaProvider:CategoriesEndpoint"]);
+
+                response.EnsureSuccessStatusCode();
+
+                var responseObject = JsonConvert.DeserializeObject<NasaCategoriesResponseModel>(await response.Content.ReadAsStringAsync());
+
+                return responseObject.Categories;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("GetEventsList Error: {@exception}", ex);
+                throw;
+            }
         }
 
         public async Task<EventModel> GetEvent(string eventId)
