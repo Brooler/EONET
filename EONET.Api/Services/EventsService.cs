@@ -4,6 +4,7 @@ using EONET.Core.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EONET.Api.Services
@@ -19,11 +20,11 @@ namespace EONET.Api.Services
             _logger = logger;
         }
 
-        public Task<EventModel> GetEvent(string eventId)
+        public async Task<EventModel> GetEvent(string eventId)
         {
             try
             {
-                return _eventsProvider.GetEvent(eventId);
+                return await _eventsProvider.GetEvent(eventId);
             }
             catch (Exception ex)
             {
@@ -32,11 +33,43 @@ namespace EONET.Api.Services
             }
         }
 
-        public Task<IEnumerable<EventModel>> GetEventsList(EventListFilterModel filter)
+        public async Task<IEnumerable<EventModel>> GetEventsList(EventListFilterModel filter)
         {
             try
             {
-                return _eventsProvider.GetEventsList(filter);
+                var events = await _eventsProvider.GetEventsList(filter);
+                
+                if (filter.CategoryId.HasValue)
+                {
+                    events = events.Where(e => e.Categories.Any(c => c.Id == filter.CategoryId.Value));
+                }
+
+                if (filter.Sorting.HasValue)
+                {
+                    switch (filter.Sorting.Value)
+                    {
+                        case Core.Enums.SortingTypeEnum.StatusAsc:
+                            events = events.OrderBy(e => e.Closed);
+                            break;
+                        case Core.Enums.SortingTypeEnum.StatusDesc:
+                            events = events.OrderByDescending(e => e.Closed);
+                            break;
+                        case Core.Enums.SortingTypeEnum.DateAsc:
+                            events = events.OrderBy(e => e.Geometries?.FirstOrDefault()?.Date);
+                            break;
+                        case Core.Enums.SortingTypeEnum.DateDesc:
+                            events = events.OrderByDescending(e => e.Geometries?.FirstOrDefault()?.Date);
+                            break;
+                        case Core.Enums.SortingTypeEnum.CategoryAsc:
+                            events = events.OrderBy(e => e.Categories?.FirstOrDefault()?.Title);
+                            break;
+                        case Core.Enums.SortingTypeEnum.CategoryDesc:
+                            events = events.OrderByDescending(e => e.Categories?.FirstOrDefault()?.Title);
+                            break;
+                    }
+                }
+
+                return events;
             }
             catch(Exception ex)
             {

@@ -60,9 +60,12 @@ export class EventsFilter extends React.PureComponent<any, any> {
             value={this.props.sorting}
           >
             <option value="">Default</option>
-            <option value="date">Date</option>
-            <option value="status">Status</option>
-            <option value="category">Category</option>
+            <option value="dateAsc">Date Asc</option>
+            <option value="dateDesc">Date Desc</option>
+            <option value="statusAsc">Status Asc</option>
+            <option value="statusDesc">Status Desc</option>
+            <option value="categoryAsc">Category Asc</option>
+            <option value="categoryDesc">Category Desc</option>
           </select>
           <button onClick={this.props.submitHandler}>Apply filter</button>
         </div>

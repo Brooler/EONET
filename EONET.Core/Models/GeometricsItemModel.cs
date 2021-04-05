@@ -9,6 +9,6 @@ namespace EONET.Core.Models
 
         public GeometricsTypeEnum Type { get; set; }
 
-        public double[] Coordinates { get; set; }
+        public object Coordinates { get; set; }
     }
 }

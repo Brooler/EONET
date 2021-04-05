@@ -19,6 +19,6 @@ namespace EONET.Core.Models
 
         public IEnumerable<SourceItemModel> Sources { get; set; }
 
-        public IEnumerable<GeometricsItemModel> Geometrics { get; set; }
+        public IEnumerable<GeometricsItemModel> Geometries { get; set; }
     }
 }

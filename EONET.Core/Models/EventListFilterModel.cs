@@ -14,6 +14,10 @@ namespace EONET.Core.Models
 
         public int? Days { get; set; }
 
+        public int? CategoryId { get; set; }
+
+        public SortingTypeEnum? Sorting { get; set; }
+
         public Dictionary<string, string> ToDictionary()
         {
             var result = new Dictionary<string, string>();
