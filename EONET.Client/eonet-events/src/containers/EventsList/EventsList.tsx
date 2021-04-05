@@ -37,6 +37,7 @@ export class EventsList extends React.PureComponent<any, any> {
                     key={event.id}
                     id={event.id}
                     title={event.title}
+                    closed={event.closed}
                   ></EventListItem>
                 );
               })}
