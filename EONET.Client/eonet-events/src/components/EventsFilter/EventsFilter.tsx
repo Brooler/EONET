@@ -1,10 +1,13 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import "./EventsFilter.css";
 import getCategories from "./api";
 import { AxiosResponse } from "axios";
-import { EventsFilterModel } from "../../core/models/EventsFilterModel";
+import { CategoryModel } from "../../core/models/CategoryModel";
 
-export class EventsFilter extends React.PureComponent<any, any> {
+export class EventsFilter extends React.PureComponent<
+  any,
+  { categories: CategoryModel[]; categoriesLoaded: boolean }
+> {
   constructor(props: any) {
     super(props);
 
@@ -14,12 +17,11 @@ export class EventsFilter extends React.PureComponent<any, any> {
     };
   }
 
-  private filter: EventsFilterModel = {};
-
   componentDidMount() {
     this.getCategories();
   }
 
+  //TODO: Better to split all filters/sorting to its own components
   render() {
     if (this.state.categoriesLoaded) {
       return (
@@ -77,28 +79,17 @@ export class EventsFilter extends React.PureComponent<any, any> {
 
   getCategories() {
     if (!this.state.categoriesLoaded) {
-      getCategories().then((response: AxiosResponse<any>) => {
-        this.setState({
-          categories: response.data,
-          categoriesLoaded: true,
+      getCategories()
+        .then((response: AxiosResponse<CategoryModel[]>) => {
+          this.setState({
+            categories: response.data,
+            categoriesLoaded: true,
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          //TODO: Better error handling here
         });
-      });
     }
-  }
-
-  statusChangeHandler(event: any) {
-    this.filter.statusFilter = event.target.value;
-  }
-
-  lastDaysChangeHandler(event: any) {
-    this.filter.lastDaysFilter = event.target.value;
-  }
-
-  categoryFilterChangeHandler(event: any) {
-    this.filter.categoryId = event.target.value;
-  }
-
-  sortingChangeHandler(event: any) {
-    this.filter.sorting = event.target.value;
   }
 }

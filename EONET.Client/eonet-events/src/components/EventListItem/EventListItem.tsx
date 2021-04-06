@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./EventListItem.css";
 
-export class EventListItem extends React.PureComponent<any, any> {
+export class EventListItem extends React.PureComponent<any> {
   render() {
     return (
       <tr className={`EventListItem ${this.props.closed ? "closed" : ""}`}>

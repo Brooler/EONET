@@ -1,9 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import getEvent from "./api";
 import { AxiosResponse } from "axios";
 import { Link } from "react-router-dom";
+import { EventModel } from "../../core/models/EventModel";
 
-export class EventDetails extends React.PureComponent<any, any> {
+export class EventDetails extends React.PureComponent<
+  any,
+  { event: EventModel; eventLoaded: boolean }
+> {
   constructor(props: any) {
     super(props);
 
@@ -26,6 +30,7 @@ export class EventDetails extends React.PureComponent<any, any> {
           </a>
         </div>
       );
+      //TODO: More details here
     } else {
       return <p>Loading...</p>;
     }
@@ -37,14 +42,17 @@ export class EventDetails extends React.PureComponent<any, any> {
 
   getEventDetails() {
     if (!this.state.eventLoaded) {
-      getEvent(this.props.location.search.substring(1)).then(
-        (response: AxiosResponse<any>) => {
+      getEvent(this.props.location.search.substring(1))
+        .then((response: AxiosResponse<EventModel>) => {
           this.setState({
             event: response.data,
             eventLoaded: true,
           });
-        }
-      );
+        })
+        .catch((error) => {
+          console.error(error);
+          //TODO: better error handling here
+        });
     }
   }
 }

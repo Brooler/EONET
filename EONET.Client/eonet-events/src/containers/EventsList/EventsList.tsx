@@ -1,12 +1,16 @@
-import React, { Component } from "react";
+import React from "react";
 import getEventsList from "./api";
 import { EventListItem } from "../../components/EventListItem/EventListItem";
 import { AxiosResponse } from "axios";
 import "./EventsList.css";
 import { EventsFilterModel } from "../../core/models/EventsFilterModel";
 import { EventsFilter } from "../../components/EventsFilter/EventsFilter";
+import { EventModel } from "../../core/models/EventModel";
 
-export class EventsList extends React.PureComponent<any, any> {
+export class EventsList extends React.PureComponent<
+  any,
+  { events: EventModel[]; eventsLoaded: boolean; filter: EventsFilterModel }
+> {
   constructor(props: any) {
     super(props);
 
@@ -21,29 +25,20 @@ export class EventsList extends React.PureComponent<any, any> {
     let eventsTable;
     if (this.state.eventsLoaded) {
       eventsTable = (
-        <div className="EventsList">
-          <table>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.events.map((event: any) => {
-                return (
-                  <EventListItem
-                    key={event.id}
-                    id={event.id}
-                    title={event.title}
-                    closed={event.closed}
-                  ></EventListItem>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.events.map((event: any) => {
+              return <EventListItem key={event.id} {...event}></EventListItem>;
+            })}
+          </tbody>
+        </table>
       );
     } else {
       eventsTable = <p>Loading...</p>;
@@ -76,14 +71,17 @@ export class EventsList extends React.PureComponent<any, any> {
 
   getEvents = () => {
     if (!this.state.eventsLoaded)
-      getEventsList(this.state.filter).then(
-        (response: AxiosResponse<any[]>) => {
+      getEventsList(this.state.filter)
+        .then((response: AxiosResponse<EventModel[]>) => {
           this.setState({
             events: response.data,
             eventsLoaded: true,
           });
-        }
-      );
+        })
+        .catch((error) => {
+          console.error(error);
+          //TODO: Better error handling here
+        });
   };
 
   filterSubmitHandler() {
