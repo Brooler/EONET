@@ -1,3 +1,9 @@
 .EventsFilter {
-  text-align: center;
+  margin-top: 10px;
+  padding: 20px;
+  border: 1px solid #dee2e6;
+}
+
+.EventsFilter button.float-right {
+  float: right;
 }

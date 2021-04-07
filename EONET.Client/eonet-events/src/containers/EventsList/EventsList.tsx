@@ -6,18 +6,31 @@ import "./EventsList.css";
 import { EventsFilterModel } from "../../core/models/EventsFilterModel";
 import { EventsFilter } from "../../components/EventsFilter/EventsFilter";
 import { EventModel } from "../../core/models/EventModel";
+import Table from "react-bootstrap/Table";
+import { Container } from "react-bootstrap";
+import { FilterPlaceholder } from "../../components/FilterPlaceholder/FilterPlaceholder";
 
 export class EventsList extends React.PureComponent<
   any,
-  { events: EventModel[]; eventsLoaded: boolean; filter: EventsFilterModel }
+  {
+    events: EventModel[];
+    eventsLoaded: boolean;
+    filter: EventsFilterModel;
+    hideFilter: boolean;
+  }
 > {
   constructor(props: any) {
     super(props);
 
+    const filter: EventsFilterModel = {
+      lastDaysFilter: 365,
+    };
+
     this.state = {
       events: [],
       eventsLoaded: false,
-      filter: new EventsFilterModel(),
+      filter: filter,
+      hideFilter: true,
     };
   }
 
@@ -25,7 +38,7 @@ export class EventsList extends React.PureComponent<
     let eventsTable;
     if (this.state.eventsLoaded) {
       eventsTable = (
-        <table>
+        <Table bordered>
           <thead>
             <tr>
               <th>Id</th>
@@ -38,14 +51,16 @@ export class EventsList extends React.PureComponent<
               return <EventListItem key={event.id} {...event}></EventListItem>;
             })}
           </tbody>
-        </table>
+        </Table>
       );
     } else {
       eventsTable = <p>Loading...</p>;
     }
 
-    return (
-      <div className="EventsList">
+    let filterComponent;
+
+    if (!this.state.hideFilter) {
+      filterComponent = (
         <EventsFilter
           {...this.state.filter}
           submitHandler={this.filterSubmitHandler.bind(this)}
@@ -55,9 +70,22 @@ export class EventsList extends React.PureComponent<
             this
           )}
           sortingChangeHandler={this.sortingChangeHandler.bind(this)}
+          hideFilterHandler={this.hideFilterHandler.bind(this)}
         ></EventsFilter>
+      );
+    } else {
+      filterComponent = (
+        <FilterPlaceholder
+          showFilterHandler={this.hideFilterHandler.bind(this)}
+        />
+      );
+    }
+
+    return (
+      <Container className="EventsList">
+        {filterComponent}
         {eventsTable}
-      </div>
+      </Container>
     );
   }
 
@@ -123,6 +151,12 @@ export class EventsList extends React.PureComponent<
 
     this.setState({
       filter: filter,
+    });
+  }
+
+  hideFilterHandler(hide: boolean) {
+    this.setState({
+      hideFilter: hide,
     });
   }
 }
